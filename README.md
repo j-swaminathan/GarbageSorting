@@ -8,6 +8,7 @@ We train 3 models:
 
 and save the model weights. Since CNN model weights are more than 100MB, we load only the pretrained models to the repository.
 
+We store the model weights in GarbageRecognition/model folder
 Using the 2 saved models, we build a FLASK app where we load an image or capture an image with the webcam and classify it into 6 different Garbage categories.
 
 The categories are
