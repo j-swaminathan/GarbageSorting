@@ -35,6 +35,14 @@ The categories are
     cd GarbageSorting
     ```
 
+### Running the Flask App
+
+1. **Navigate to the Flask app directory:**
+
+    ```bash
+    cd GarbageRecognition
+    ```
+
 2. **Set up a virtual environment:**
 
     ```bash
@@ -48,21 +56,13 @@ The categories are
     pip install -r requirements.txt
     ```
 
-### Running the Flask App
-
-1. **Navigate to the Flask app directory:**
-
-    ```bash
-    cd GarbageRecognition
-    ```
-
-2. **Run the Flask app:**
+4. **Run the Flask app:**
 
     ```bash
     python app.py
     ```
 
-3. **Open your browser and go to:**
+5. **Open your browser and go to:**
 
     ```
     http://127.0.0.1:5000/
@@ -74,6 +74,13 @@ The categories are
 - **Capture an Image:** Click on the "Start Camera" button to use your webcam, then click on "Capture Image" to take picture and click on "Upload" to classify it.
 
 
+### License
+
+This project is licensed under the MIT License.
+
+### Acknowledgments
+
+- Kaggle for the Garbage classification dataset.
 
 
 
