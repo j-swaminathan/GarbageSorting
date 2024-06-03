@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Comparison</title>
+    <style>
+        #imagePreview {
+            display: none;
+            width: 300px;
+            height: auto;
+            border: 2px solid #ddd;
+            margin-top: 20px;
+        }
+        #videoElement {
+            display: none;
+            width: 300px;
+            height: auto;
+            border: 2px solid #ddd;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body style="background-color:powderblue;">
+
+    <h1 style="color:red;">Garbage Sorting</h1>
+    <img src="static/demo/glass.jpg" alt="description" height="48" width="100">
+    <img src="static/demo/paper.jpg" alt="description" height="48" width="100">
+    <img src="static/demo/cardboard.jpg" alt="description" height="48" width="100">
+    <img src="static/demo/plastic.jpg" alt="description" height="48" width="100">
+    <img src="static/demo/trash.jpg" alt="description" height="48" width="100">
+    <img src="static/demo/metal.jpg" alt="description" height="48" width="100">
+    <h4 style="color:purple;"> Let's sort the trash!
+        In this application, using Deep learning models we sort the uploaded picture into
+        <br />
+        'Glass, Paper, Cardboard, Plastic, Trash or Metal' categories.
+        <br />
+         <br />
+         <br />
+         <br />
+        Upload or capture a picture of Garbage and press Upload for the results with 2 different deep learning models.
+    </h4>
+    <form id="uploadForm" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" id="fileInput" accept="image/*">
+        <button type="button" id="startCaptureButton">Start Camera</button>
+        <button type="button" id="captureButton" style="display: none;">Capture Image</button>
+         <br />
+         <br />
+         <br />
+
+
+        <button type="submit">Upload</button>
+    </form>
+
+    <br>
+
+    <video id="videoElement" autoplay></video>
+    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+    <br>
+    <img id="imagePreview" alt="Image Preview">
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const startCaptureButton = document.getElementById('startCaptureButton');
+        const captureButton = document.getElementById('captureButton');
+        const videoElement = document.getElementById('videoElement');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const imagePreview = document.getElementById('imagePreview');
+
+        let stream;
+
+        // Function to preview the uploaded image
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Start camera feed
+        startCaptureButton.addEventListener('click', function() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(mediaStream) {
+                    stream = mediaStream;
+                    videoElement.srcObject = stream;
+                    videoElement.style.display = 'block';
+                    captureButton.style.display = 'inline-block';
+                    startCaptureButton.style.display = 'none';
+                })
+                .catch(function(error) {
+                    console.error('Error accessing webcam:', error);
+                });
+        });
+
+        // Capture image from webcam
+        captureButton.addEventListener('click', function() {
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            const imgData = canvas.toDataURL('image/jpeg');
+            imagePreview.src = imgData;
+            imagePreview.style.display = 'block';
+
+            stream.getTracks().forEach(track => track.stop()); // Stop the webcam stream
+            videoElement.style.display = 'none';
+            captureButton.style.display = 'none';
+            startCaptureButton.style.display = 'inline-block';
+
+            const blob = dataURItoBlob(imgData);
+            const file = new File([blob], 'captured_image.jpg');
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+        });
+
+        // Function to convert data URI to Blob
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
+        }
+    </script>
+
+    {% if prediction %}
+        <h2>Predictions:</h2>
+        <ul>
+
+            <li>ResNet: {{ prediction.resnet }} with {{prediction.acc_resnet}}% accuracy </li>
+            <li>VGG: {{ prediction.vgg }} with {{prediction.acc_vgg}}% accuracy </li>
+        </ul>
+        <h3>Uploaded/Captured Image:</h3>
+        <img src="{{ url_for('static', filename='uploads/' + file_name) }}" alt="Uploaded Image" style="width: 300px; height: auto;">
+    {% endif %}
+</body>
+</html>
