@@ -82,16 +82,3 @@ This project is licensed under the MIT License.
 
 - Kaggle for the Garbage classification dataset.
 
-
-
-
-
-
-
-
-
-
-
-
-
--
